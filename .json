@@ -1,0 +1,88 @@
+{
+  "AgentBidResponse": {
+    "$": {
+      "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+      "xmlns:xsd": "http://www.w3.org/2001/XMLSchema"
+    },
+    "Agent": {
+      "$": { "Id": "20302" },
+      "Reference": "AgentRef_1744274442741",
+      "Time": "2025-04-10T08:40:42.741Z"
+    },
+    "Result": { "Success": "true" },
+    "BidReference": "02df160c-5df6-44ee-8aa3-3cf212973dc6",
+    "Offers": {
+      "Offer": {
+        "$": { "Reference": "6e93a776-f051-4f0f-95ff-5b6aa21430cc" },
+        "Pricing": {
+          "PricingMethod": "FixedPrice",
+          "Price": "92930",
+          "Commission": "0",
+          "Gratuity": "0",
+          "Currency": "GBP",
+          "LoyaltyCard": "0",
+          "PromotionCodeDiscount": "0",
+          "PriceNET": "92930",
+          "ServiceCharge": "0",
+          "VAT": "0",
+          "MarketPlaceCommission": "0",
+          "MarketPlaceCommissionVAT": "0",
+          "ServiceChargeVAT": "0",
+          "AgentCommission": "0",
+          "AgentCommissionVAT": "0",
+          "CancellationCharge": "92930",
+          "NoFareCharge": "92930",
+          "AreaCharge": "0",
+          "SurgeFactor": "100"
+        },
+        "VehicleType": "Saloon",
+        "VehicleCategory": "Standard",
+        "AvailableEvents": "BookingDispatched LocationUpdate VehicleArrived PassengerOnBoard NoFare BookingCompleted BookingCancelled FollowOnBooking",
+        "Vendor": { "$": { "Id": "700999" } },
+        "VendorMessage": "",
+        "VendorDetails": {
+          "Name": "Default Liverpool 8 Test",
+          "Address": "Test Vendor 00999 Address",
+          "Description": "Test Vendor 00999 Description",
+          "City": "Cheadle",
+          "Country": "GBR",
+          "TelephoneNumber": "01614701011",
+          "EmailAddress": "",
+          "Fleet": {
+            "Count": "702",
+            "Uniform": "Unknown",
+            "Vehicles": {
+              "VehicleInformation": [
+                { "Make": "Honda", "Model": "Jazz", "Count": "1" },
+                { "Make": "SERSEZEW", "Model": "NREGEDGY", "Count": "1" },
+                { "Make": "TGYIMBAS", "Model": "JEVBISEY", "Count": "1" },
+                { "Make": "POGEXKAR", "Model": "POEFDOEL", "Count": "1" },
+                { "Make": "YESFYEQU", "Model": "YAZYEKAP", "Count": "1" },
+                { "Make": "JAZREYUS", "Model": "GINGIZIB", "Count": "1" },
+                { "Make": "MIVDACAQ", "Model": "IMOZECTA", "Count": "1" },
+                { "Make": "FCAWALDO", "Model": "MOUVEPUV", "Count": "1" },
+                { "Make": "YEMVEDHU", "Model": "ZQUAWHUW", "Count": "1" },
+                { "Make": "BKIQUAME", "Model": "KZIQUIHE", "Count": "1" }
+              ]
+            }
+          },
+          "Rating": "FiveStar",
+          "NumberOfRatings": "4",
+          "AverageEta": "786"
+        },
+        "EstimatedJourney": {
+          "Distance": "595290",
+          "Duration": "515",
+          "Route": "cgryH@sA@hAITiAhDKXIPOTQVUVSV_?BABABA@a@Rq@V@LDz@FpADh@JzBH~AFnA@H@TBRRbBH~@Jl@EDu@^IF"
+        },
+        "AgentIsVendor": "false",
+        "RequestTime": "80"
+      }
+    },
+    "NoOffers": "",
+    "RequestTime": "175"
+  }
+}
+
+
+
