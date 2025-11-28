@@ -33,6 +33,9 @@ dotenv.config({ path: envPath });
 
 console.log(process.env.NODE_ENV);
 
+// Check if running in Vercel serverless environment
+const isVercel = process.env.VERCEL === "1" || process.env.VERCEL_ENV;
+
 const app = express();
 
 // Initialize Sentry for error monitoring in production
@@ -54,11 +57,21 @@ if (process.env.NODE_ENV === "production" && process.env.SENTRY_DSN) {
 // Trust proxy - needed for rate limiting when behind a proxy
 app.set("trust proxy", 1);
 
-const server = http.createServer(app);
-const PORT = process.env.PORT || 5000; // Default to 5000 for compatibility with tests
+let server;
+let io;
 
-// Initialize Socket.IO
-const io = initSocketIO(server);
+// Only initialize HTTP server and Socket.IO if not in Vercel (serverless)
+if (!isVercel) {
+  server = http.createServer(app);
+  const PORT = process.env.PORT || 5000; // Default to 5000 for compatibility with tests
+
+  // Initialize Socket.IO (only works in traditional server mode)
+  io = initSocketIO(server);
+} else {
+  console.log(
+    "Running in Vercel serverless mode - Socket.IO and scheduled jobs disabled",
+  );
+}
 
 // Setup rate limiting for production
 const apiLimiter = rateLimit({
@@ -82,9 +95,9 @@ app.use(Sentry.Handlers.requestHandler());
 // Middleware setup
 app.use(
   cors({
-    origin:process.env.FRONTEND_URL , // Restrict CORS in production
+    origin: process.env.FRONTEND_URL, // Restrict CORS in production
     credentials: true,
-  })
+  }),
 );
 app.use(helmet()); // Security headers
 app.use(morgan("dev")); // Logger
@@ -131,29 +144,69 @@ app.use(Sentry.Handlers.errorHandler());
 app.use(notFound);
 app.use(errorHandler);
 
-// Start server
-server.listen(PORT, async () => {
+// Initialize database connection (for both traditional and serverless)
+const initializeApp = async () => {
   try {
     await connectDB();
-    console.log(
-      `️🏽‍➡️Server running in ${
-        process.env.NODE_ENV || "development"
-      } mode on port ${PORT}`
-    );
-    console.log(`🔍 Health check: http://127.0.0.1:${PORT}/health-check`);
-    console.log(`🔗 API base URL: http://127.0.0.1:${PORT}/api`);
-    console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL}`);
+    if (!isVercel) {
+      console.log(
+        `️🏽‍➡️Server running in ${
+          process.env.NODE_ENV || "development"
+        } mode on port ${process.env.PORT || 5000}`,
+      );
+      console.log(
+        `🔍 Health check: http://127.0.0.1:${
+          process.env.PORT || 5000
+        }/health-check`,
+      );
+      console.log(
+        `🔗 API base URL: http://127.0.0.1:${process.env.PORT || 5000}/api`,
+      );
+      console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL}`);
 
-    // Initialize scheduled jobs
-    if (process.env.NODE_ENV !== "test") {
-      initScheduledJobs();
-      console.log("✅ Scheduled jobs initialized");
+      // Initialize scheduled jobs (only in traditional server mode)
+      if (process.env.NODE_ENV !== "test") {
+        initScheduledJobs();
+        console.log("✅ Scheduled jobs initialized");
+      }
+    } else {
+      console.log("✅ Serverless function initialized");
     }
   } catch (error) {
-    console.error("Failed to start server:", error);
-    process.exit(1);
+    console.error("Failed to initialize app:", error);
+    if (!isVercel) {
+      process.exit(1);
+    }
   }
-});
+};
 
-// Export for testing purposes
-module.exports = { app, server };
+// Start server only if not in Vercel (serverless mode)
+if (!isVercel) {
+  const PORT = process.env.PORT || 5000;
+  server.listen(PORT, initializeApp);
+} else {
+  // In Vercel, initialize DB connection on first request
+  // This will be cached for subsequent requests in the same function instance
+  let dbInitialized = false;
+  app.use(async (req, res, next) => {
+    if (!dbInitialized) {
+      try {
+        await initializeApp();
+        dbInitialized = true;
+      } catch (error) {
+        console.error("Database initialization error:", error);
+        // Continue anyway - some routes might not need DB
+      }
+    }
+    next();
+  });
+}
+
+// Export for Vercel serverless function and testing
+// In Vercel, we export just the app
+// In traditional mode, we export both app and server
+if (isVercel) {
+  module.exports = app;
+} else {
+  module.exports = { app, server };
+}
